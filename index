@@ -1,0 +1,83 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>n8n Терминал</title>
+  <style>
+    body {
+      background: #000;
+      color: #0f0;
+      font-family: monospace;
+      padding: 20px;
+    }
+    #terminal {
+      border: 1px solid #0f0;
+      padding: 10px;
+      height: 300px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      margin-bottom: 10px;
+    }
+    #inputLine {
+      width: 100%;
+      background: #000;
+      border: 1px solid #0f0;
+      color: #0f0;
+      font-family: monospace;
+      padding: 10px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>n8n Терминал</h2>
+<div id="terminal">[Запуск терминала...]</div>
+<input id="inputLine" placeholder="Введите команду и нажмите Enter" autocomplete="off" autofocus>
+
+<script>
+  const allowedKeys = ["abc123", "demo456", "test789"];
+  const params = new URLSearchParams(window.location.search);
+  const key = params.get("key");
+
+  const terminal = document.getElementById("terminal");
+  const inputLine = document.getElementById("inputLine");
+
+  if (!allowedKeys.includes(key)) {
+    terminal.textContent = "❌ Доступ запрещён. Неверный ключ.";
+    inputLine.style.display = "none";
+  } else {
+    terminal.textContent = "✅ Доступ разрешён. Введите команду:";
+  }
+
+  inputLine.addEventListener("keydown", async (e) => {
+    if (e.key === "Enter") {
+      const input = inputLine.value.trim();
+      if (!input) return;
+
+      terminal.innerHTML += `\n> ${input}`;
+      inputLine.value = "";
+      terminal.scrollTop = terminal.scrollHeight;
+
+      try {
+        const response = await fetch("https://your-n8n-domain/webhook/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: input, key })
+        });
+
+        const data = await response.json();
+        const reply = data.reply || JSON.stringify(data);
+        terminal.innerHTML += `\n< ${reply}`;
+      } catch (err) {
+        terminal.innerHTML += `\n< Ошибка: ${err.message}`;
+      }
+
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+  });
+</script>
+
+</body>
+</html>
