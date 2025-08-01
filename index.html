@@ -1,83 +1,154 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>n8n Терминал</title>
-  <style>
-    body {
-      background: #000;
-      color: #0f0;
-      font-family: monospace;
-      padding: 20px;
-    }
-    #terminal {
-      border: 1px solid #0f0;
-      padding: 10px;
-      height: 300px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      margin-bottom: 10px;
-    }
-    #inputLine {
-      width: 100%;
-      background: #000;
-      border: 1px solid #0f0;
-      color: #0f0;
-      font-family: monospace;
-      padding: 10px;
-      font-size: 16px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чат с ботом</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f7f6;
+            margin: 0;
+        }
+        .chat-container {
+            width: 400px;
+            max-width: 90%;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            background-color: #fff;
+        }
+        .chat-header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.2em;
+        }
+        .chat-messages {
+            height: 350px;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .message {
+            max-width: 70%;
+            padding: 8px 12px;
+            border-radius: 15px;
+            word-wrap: break-word;
+        }
+        .message.user {
+            background-color: #e0f7fa;
+            align-self: flex-end;
+        }
+        .message.bot {
+            background-color: #dcedc8;
+            align-self: flex-start;
+        }
+        .chat-input-container {
+            display: flex;
+            border-top: 1px solid #eee;
+            padding: 10px;
+        }
+        .chat-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            margin-right: 10px;
+            font-size: 1em;
+        }
+        .chat-send-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        .chat-send-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
+    <div class="chat-container">
+        <div class="chat-header">Чат с ботом n8n</div>
+        <div class="chat-messages" id="chatMessages">
+            </div>
+        <div class="chat-input-container">
+            <input type="text" id="chatInput" class="chat-input" placeholder="Введите ваше сообщение...">
+            <button id="sendMessageBtn" class="chat-send-btn">Отправить</button>
+        </div>
+    </div>
 
-<h2>n8n Терминал</h2>
-<div id="terminal">[Запуск терминала...]</div>
-<input id="inputLine" placeholder="Введите команду и нажмите Enter" autocomplete="off" autofocus>
+    <script>
+        // *** ОЧЕНЬ ВАЖНО: ЗАМЕНИТЕ ЭТОТ URL НА URL ВАШЕГО WEBHOOK ИЗ N8N ***
+        const N8N_WEBHOOK_URL = 'ВАШ_N8N_WEBHOOK_URL'; // Пример: 'https://your.n8n.cloud/webhook-test/a1b2c3d4e5f6g7h8i9j0'
 
-<script>
-  const allowedKeys = ["abc123", "demo456", "test789"];
-  const params = new URLSearchParams(window.location.search);
-  const key = params.get("key");
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendMessageBtn = document.getElementById('sendMessageBtn');
 
-  const terminal = document.getElementById("terminal");
-  const inputLine = document.getElementById("inputLine");
+        // Функция для добавления сообщения в чат
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', sender);
+            messageDiv.textContent = text;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight; // Автоматическая прокрутка вниз
+        }
 
-  if (!allowedKeys.includes(key)) {
-    terminal.textContent = "❌ Доступ запрещён. Неверный ключ.";
-    inputLine.style.display = "none";
-  } else {
-    terminal.textContent = "✅ Доступ разрешён. Введите команду:";
-  }
+        // Отправка сообщения
+        async function sendMessage() {
+            const messageText = chatInput.value.trim();
+            if (messageText === '') return;
 
-  inputLine.addEventListener("keydown", async (e) => {
-    if (e.key === "Enter") {
-      const input = inputLine.value.trim();
-      if (!input) return;
+            addMessage(messageText, 'user'); // Показываем сообщение пользователя
+            chatInput.value = ''; // Очищаем поле ввода
 
-      terminal.innerHTML += `\n> ${input}`;
-      inputLine.value = "";
-      terminal.scrollTop = terminal.scrollHeight;
+            try {
+                const response = await fetch(N8N_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    // Отправляем сообщение пользователя в n8n в JSON-формате
+                    body: JSON.stringify({ message: messageText })
+                });
 
-      try {
-        const response = await fetch("https://your-n8n-domain/webhook/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: input, key })
+                if (!response.ok) {
+                    throw new Error(`Ошибка сети: ${response.status}`);
+                }
+
+                const data = await response.json();
+                // Ожидаем, что n8n вернет объект с ключом 'message'
+                addMessage(data.message || 'Произошла ошибка или бот не ответил.', 'bot');
+
+            } catch (error) {
+                console.error('Ошибка при отправке сообщения:', error);
+                addMessage('Извините, произошла ошибка связи с ботом.', 'bot');
+            }
+        }
+
+        // Обработчики событий
+        sendMessageBtn.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
         });
 
-        const data = await response.json();
-        const reply = data.reply || JSON.stringify(data);
-        terminal.innerHTML += `\n< ${reply}`;
-      } catch (err) {
-        terminal.innerHTML += `\n< Ошибка: ${err.message}`;
-      }
-
-      terminal.scrollTop = terminal.scrollHeight;
-    }
-  });
-</script>
-
+        // Начальное сообщение от бота
+        addMessage('Привет! Я ваш чат-бот. Чем могу помочь?', 'bot');
+    </script>
 </body>
 </html>
