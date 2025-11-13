@@ -4,22 +4,25 @@ const responseMsg = document.getElementById("responseMsg");
 let selectedTariff = null;
 let selectedAI = null;
 
+// Выбор тарифа
 document.querySelectorAll(".tariff-btn").forEach(btn => {
   btn.addEventListener("click", () => {
-    document.querySelectorAll(".tariff-btn").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
+    document.querySelectorAll(".tariff-btn").forEach(b => b.classList.remove("selected"));
+    btn.classList.add("selected");
     selectedTariff = btn.dataset.value;
   });
 });
 
+// Выбор ИИ
 document.querySelectorAll(".ai-btn").forEach(btn => {
   btn.addEventListener("click", () => {
-    document.querySelectorAll(".ai-btn").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
+    document.querySelectorAll(".ai-btn").forEach(b => b.classList.remove("selected"));
+    btn.classList.add("selected");
     selectedAI = btn.dataset.value;
   });
 });
 
+// Отправка формы
 submitBtn.addEventListener("click", async () => {
   const phone = document.getElementById("phone").value.trim();
   const street = document.getElementById("street").value.trim();
@@ -31,7 +34,7 @@ submitBtn.addEventListener("click", async () => {
   }
 
   if (!selectedTariff || !selectedAI) {
-    return alert("Выберите тариф и ИИ");
+    return alert("Выберите тариф и модель ИИ");
   }
 
   const data = {
@@ -64,3 +67,4 @@ submitBtn.addEventListener("click", async () => {
     responseMsg.style.color = "red";
   }
 });
+
