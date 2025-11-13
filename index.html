@@ -2,27 +2,48 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
+  <title>Главная страница</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Обратная связь</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <h1>Форма обратной связи</h1>
-    <form id="feedbackForm">
-      <label>Имя:
-        <input type="text" name="name" required />
-      </label>
-      <label>Email:
-        <input type="email" name="email" required />
-      </label>
-      <label>Сообщение:
-        <textarea name="message" rows="5" required></textarea>
-      </label>
-      <button type="submit">Отправить</button>
-    </form>
-    <div id="responseMsg"></div>
+    <h1>Форма подключения</h1>
+    
+    <!-- Телефон -->
+    <label>Номер телефона (Нидерланды):</label>
+    <div class="phone-input">
+      <span>+31</span>
+      <input type="text" id="phone" maxlength="6" required pattern="\d{6}" placeholder="123456" />
+    </div>
+
+    <!-- Тарифы -->
+    <div class="button-row">
+      <button type="button" class="tariff-btn" data-value="Тариф 1">Тариф 1</button>
+      <button type="button" class="tariff-btn" data-value="Тариф 2">Тариф 2</button>
+      <button type="button" class="tariff-btn" data-value="Тариф 3">Тариф 3</button>
+    </div>
+
+    <!-- Адрес -->
+    <label>Адрес (по стандарту Нидерландов):</label>
+    <input type="text" id="street" placeholder="Улица и номер дома" required />
+    <input type="text" id="postcode" placeholder="Почтовый индекс (например 1012NX)" pattern="[1-9][0-9]{3}[A-Z]{2}" required />
+    <input type="text" id="city" placeholder="Город" required />
+
+    <!-- ИИ блок -->
+    <div class="button-row">
+      <button type="button" class="ai-btn" data-value="ИИ1">ИИ1</button>
+      <button type="button" class="ai-btn" data-value="ИИ2">ИИ2</button>
+      <button type="button" class="ai-btn" data-value="ИИ3">ИИ3</button>
+    </div>
+
+    <!-- Отправить -->
+    <button id="submitBtn">Отправить</button>
+
+    <p id="responseMsg"></p>
   </div>
+
   <script src="script.js"></script>
 </body>
 </html>
+
