@@ -67,15 +67,16 @@ button {
   cursor: pointer;
 }
 
-button:hover:not(.active) {
+button:hover {
   background-color: #1b4f72;
 }
 
-/* Цвет выбранной кнопки */
-button.active {
-  background-color: #28a745 !important;
+/* ОРАНЖЕВАЯ выбранная кнопка */
+button.selected {
+  background-color: orange !important;
   color: #fff;
 }
+
 
 #submitBtn {
   width: 100%;
